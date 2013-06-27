@@ -1,0 +1,95 @@
+<%
+
+import random
+from random import choice
+
+def make_chains(corpus):
+    """Takes an input text as a string and returns a dictionary of
+    markov chains."""
+    
+    chain = {}
+    words = corpus.split()
+    
+    for i in range(len(words)-2):
+        pair = (words[i], words[i+1])
+        if (pair in chain):
+            chain[pair] += [ words[i+2] ]
+        else:
+            chain[pair] = [ words[i+2] ]
+        
+    return chain
+
+def make_text(chains):
+    """Takes a dictionary of markov chains and returns random text
+    based off an original text."""
+    
+    # To start, we want a word that starts with a capital letter
+    start = 'z'
+    while (start[0][0] != start[0][0].upper()):
+        start = random.choice(chains.keys())
+    
+    line = list(start)
+    
+    last = line[-1][-1]
+#    while (len(line) < 10):
+    while (not line[-1][-1] in ['.','?']):
+    	next = chains[tuple(line[-2:])]
+    	line += [ choice(next) ]
+#    	print "line: %r" % line
+    
+#    print "line: %r" % line
+    
+    return " ".join(line)
+
+
+# Change this to read input_text from a file
+f = open('/tmp/lyrics.txt', "r")
+chain_dict = make_chains(f.read())
+f.close()
+
+%>
+
+<html>
+  <head>
+    <title>Cranberries Lyric Generator</title>
+  </head>
+
+  <h1>The Cranberries Lyric Generator</h1>
+
+  <p>Now you too can make songs that sound just like they were authored by Delores O'Riordan!  The song below is an original masterpiece. 
+  Did it just come out all wrong?  Just <a href="javascript:location.reload()">reload</a> to get another song.</p>
+
+<blockquote>
+<%
+
+for i in range(4):
+    req.write("<p>")
+    for i in range(4):
+        req.write( make_text(chain_dict)  + "<br/>")
+    req.write("</p>")
+ 
+#    random_text = make_text(chain_dict)
+#    print random_text
+%>
+
+</blockquote>
+
+<p>
+How in the world does this help me channel my inner Cranberries so well?  Through <a href="http://en.wikipedia.org/wiki/Markov_chain">Markov chains</a>!
+</p>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9486938-3']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+</html>
